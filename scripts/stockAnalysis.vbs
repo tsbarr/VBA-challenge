@@ -19,6 +19,11 @@ Sub test():
         ' variable declaration for reading data in
         Dim lastRow As Long
         Dim inputArray() As Variant
+	Dim resultArray() As Variant ' type variant so we can use different data types
+	Dim uniqueTickers As New Collection
+        Dim thisTicker As String
+        Dim i As Long, j as Long ' for loop counters / index within array iterators
+	
         
         ' Find last row with data in <ticker> column (i.e. 1)
         ' Source: https://www.excelcampus.com/vba/find-last-row-column-cell/
@@ -29,12 +34,9 @@ Sub test():
 
         ' get unique ticker values
         ' Source: https://stackoverflow.com/a/3017973
-        Dim uniqueTickers As New Collection
-        Dim thisTicker As String
-        Dim i As Long ' for loop counter
-        
         On Error Resume Next ' if ticker is already in collection, skip, since it will throw error
-        For i = 1 To UBound(inputArray, 1) ' note: inputArray is 1-based because it comes from a Range object
+	' note: inputArray is 1-based because it comes from a Range object
+        For i = 1 To UBound(inputArray, 1) 
         thisTicker = inputArray(i, 1)
         uniqueTickers.Add thisTicker, thisTicker
         Next
@@ -44,7 +46,7 @@ Sub test():
          ' we need an array and not collection so we can perform operations, as per: https://excelmacromastery.com/excel-vba-collections/
         ' see here for declaring dynamic arrays:
         ' https://learn.microsoft.com/en-us/office/vba/language/concepts/getting-started/declaring-arrays
-        Dim resultArray() As Variant ' type variant so we can use different data types
+        
         ReDim resultArray(uniqueTickers.Count - 1, 7) ' array dimensions, note: arrays are 0-based, but collections are 1-based
         ' resultArray has 8 columns:
                 ' 0     ticker
@@ -56,12 +58,57 @@ Sub test():
                 ' 6     percent_change = year_change / first_open
                 ' 7     total_vol
 
-        ' write uniqueTickers to resultArray first column (0)
-                
+        ' write uniqueTickers to resultArray first column (0)    
         For i = 1 To uniqueTickers.Count
-        resultArray(i - 1, 0) = uniqueTickers(i) ' note: arrays are 0-based, but collections are 1-based
+        resultArray(i - 1, 0) = uniqueTickers(i) ' note: resultArray is 0-based, but collections are 1-based
         Next i
-        
+
+	' iterate within inputArray to obtain first and last date, first open, last close and sum of vol values
+	' note: inputArray is 1-based because it comes from a Range object
+	For i = 1 To UBound(inputArray, 1)
+		thisTicker = inputArray(i, 1)
+		thisDate = inputArray(i, 2)
+		thisOpen = inputArray(i, 3)
+		thisClose = inputArray(i, 6)
+		thisVol = inputArray(i, 7)
+		' find row index of thisTicker in resultArray
+		' source for search within array: https://www.excel-pratique.com/en/vba_tricks/search-in-array-function
+		For j = 0 To UBound(resultArray, 1)
+        		If resultArray(j, 0) = thisTicker Then 'If value found
+            			' current row j is index in resultArray of thisTicker
+            			Exit For
+        		End If
+    		Next j
+		' check if this is the first time we find thisTicker by checking if value first_date is empty
+		If IsEmpty(resultArray(j, 1)) Then 
+			' initialize with current row info
+			resultArray(j, 1) = thisDate 	' first_date
+			resultArray(j, 2) = thisOpen	' first_open
+			resultArray(j, 3) = thisDate 	' last_date
+			resultArray(j, 4) = thisClose	' last_close
+			resultArray(j, 7) = thisVol	' total_vol
+		Else ' we have seen thisTicker before
+			' check if this date is earlier than first_date
+			If thisDate < resultArray(j, 1) Then
+			' replace first_date with thisDate
+			resultArray(j, 1) = thisDate
+			' and first_open with thisOpen
+			resultArray(j, 2) = thisOpen
+			End If
+			' check if thisDate is later than last_date
+			If thisDate > resultArray(j, 3) Then
+			' replace last_date with thisDate
+			resultArray(j, 3) = thisDate
+			' and last_close with thisClose
+			resultArray(j, 4) = thisClose
+			End If
+			' add thisVol to total_vol
+			resultArray(j, 7) = resultArray(j, 7) + thisVol
+		End If
+	Next i
+	' iterate within resultArray to calculate year and percent change
+	
+
 
         ' write result array to worksheet
         For i = 0 To UBound(resultArray, 1)
