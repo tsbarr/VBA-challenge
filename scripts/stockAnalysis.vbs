@@ -16,11 +16,11 @@
 ' ---
 
 Sub CalculateYearData():
-	' Turn off screen updating to improve performance, as per:
-	' https://learn.microsoft.com/en-us/office/vba/excel/concepts/cells-and-ranges/fill-a-value-down-into-blank-cells-in-a-column
-	Application.ScreenUpdating = False
+        ' Turn off screen updating to improve performance, as per:
+        ' https://learn.microsoft.com/en-us/office/vba/excel/concepts/cells-and-ranges/fill-a-value-down-into-blank-cells-in-a-column
+        Application.ScreenUpdating = False
 
-	' --- variable declaration
+        ' --- variable declaration
         Dim lastRow As Long
         Dim inputArray() As Variant, resultArray() As Variant ' type variant so we can use different data types
         Dim uniqueTickers As New Collection
@@ -30,12 +30,12 @@ Sub CalculateYearData():
         Dim ticker%, firstDate%, firstOpen%, lastDate%, lastClose%, yearChange%, percentChange%, totalVol% ' integer for index
         ' counters / index within array iterators
         Dim i&, j&
-	' max and min variables
-	Dim minPercentChangeName$, minPercentChangeValue#
-	Dim maxPercentChangeName$, maxPercentChangeValue#
-	Dim maxTotalVolName$, maxTotalVolValue as LongLong
-	
-	' --- read data into inputArray
+        ' max and min variables
+        Dim minPercentChangeName$, minPercentChangeValue#
+        Dim maxPercentChangeName$, maxPercentChangeValue#
+        Dim maxTotalVolName$, maxTotalVolValue As LongLong
+        
+        ' --- read data into inputArray
         ' Find last row with data in <ticker> column (1)
         ' Source: https://www.excelcampus.com/vba/find-last-row-column-cell/
         lastRow = Cells(Rows.Count, 1).End(xlUp).Row
@@ -54,7 +54,7 @@ Sub CalculateYearData():
         On Error GoTo 0
 
         ' --- initialize resultArray
-	' use number of uniqueTickers to declare resultArray, since we now know the number of rows we need
+        ' use number of uniqueTickers to declare resultArray, since we now know the number of rows we need
         ' we need an array and not collection so we can perform operations, as per: https://excelmacromastery.com/excel-vba-collections/
         ' see here for declaring dynamic arrays:
         ' https://learn.microsoft.com/en-us/office/vba/language/concepts/getting-started/declaring-arrays
@@ -76,7 +76,7 @@ Sub CalculateYearData():
         resultArray(i - 1, ticker) = uniqueTickers(i) ' note: resultArray is 0-based, but collections are 1-based
         Next i
 
-	' --- find firstDate, firstOpen, lastDate, lastClose and totalVol
+        ' --- find firstDate, firstOpen, lastDate, lastClose and totalVol
         ' iterate within inputArray, fill values in resultArray
         ' note: inputArray is 1-based because it comes from a Range object
         For i = 1 To UBound(inputArray, 1)
@@ -121,84 +121,90 @@ Sub CalculateYearData():
                 End If
         Next i
 
-	' --- initialize max and min variables
-	minPercentChangeName = ""
-	minPercentChangeValue = 0
-	maxPercentChangeName = ""
-	maxPercentChangeValue = 0
-	maxTotalVolName = ""
-	maxTotalVolValue = 0
+        ' --- initialize max and min variables
+        minPercentChangeName = ""
+        minPercentChangeValue = 0
+        maxPercentChangeName = ""
+        maxPercentChangeValue = 0
+        maxTotalVolName = ""
+        maxTotalVolValue = 0
         ' --- calculate year and percent change, write out and get min/max variables
-	' iterate within resultArray
+        ' iterate within resultArray
         For i = 0 To UBound(resultArray, 1)
-		' calculate year and percent change
-		' yearChange = lastClose - firstOpen
-		resultArray(i, yearChange) = resultArray(i, lastClose) - resultArray(i, firstOpen)
-		' percentChange = yearChange / firstOpen
-		resultArray(i, percentChange) = resultArray(i, yearChange) / resultArray(i, firstOpen)
-		' write to spreadsheet the columns of interest
-		' column ticker to column I (9)
-		Cells(i + 2, 9) = resultArray(i, ticker)
-		' column yearChange to column J (10)
-		Cells(i + 2, 10) = resultArray(i, yearChange)
-		' column percentChange to column K (11), with percent format
-		Cells(i + 2, 11) = FormatPercent(resultArray(i, percentChange))
-		' column totalVol to column L (12)
-		Cells(i + 2, 12) = resultArray(i, totalVol)
-		' compare to get minPercentChange
-		If resultArray(i, percentChange) < minPercentChangeValue Then
-			minPercentChangeValue = resultArray(i, percentChange)
-			minPercentChangeName = resultArray(i, ticker)
-		End If
-		' compare to get maxPercentChange
-		If resultArray(i, percentChange) > maxPercentChangeValue Then
-			maxPercentChangeValue = resultArray(i, percentChange)
-			maxPercentChangeName = resultArray(i, ticker)
-		End If
-		' compare to get maxTotalVol
-		If resultArray(i, totalVol) > maxTotalVolValue Then
-			maxTotalVolValue = resultArray(i, totalVol)
-			maxTotalVolName = resultArray(i, ticker)
-		End If
+                ' calculate year and percent change
+                ' yearChange = lastClose - firstOpen
+                resultArray(i, yearChange) = resultArray(i, lastClose) - resultArray(i, firstOpen)
+                ' percentChange = yearChange / firstOpen
+                resultArray(i, percentChange) = resultArray(i, yearChange) / resultArray(i, firstOpen)
+                ' write columns of interest to spreadsheet
+                ' column ticker to column I (9)
+                Cells(i + 2, 9) = resultArray(i, ticker)
+                ' column yearChange to column J (10)
+                Cells(i + 2, 10) = resultArray(i, yearChange)
+                ' conditional formatting Sub with above cell and yearChange
+                With Cells(i + 2, 10).Interior ' format interior color of cell
+                        If resultArray(i, yearChange) > 0 Then ' positive
+                                .Color = RGB(78, 163, 54) ' green
+                        ElseIf resultArray(i, yearChange) < 0 Then ' negative
+                                .Color = RGB(204, 39, 39) ' red
+                        Else ' it must be equal to 0
+                                .ColorIndex = 44 ' yellow
+                        End If
+                 End With
+                ' column percentChange to column K (11), with percent format
+                Cells(i + 2, 11) = FormatPercent(resultArray(i, percentChange))
+                ' conditional formatting with above cell and percentChange
+                With Cells(i + 2, 11).Interior ' format interior color of cell
+                        If resultArray(i, percentChange) > 0 Then ' positive
+                                .Color = RGB(78, 163, 54) ' green
+                        ElseIf resultArray(i, percentChange) < 0 Then ' negative
+                                .Color = RGB(204, 39, 39) ' red
+                        Else ' it must be equal to 0
+                                .ColorIndex = 44 ' yellow
+                        End If
+                 End With
+                ' column totalVol to column L (12)
+                Cells(i + 2, 12) = resultArray(i, totalVol)
+                ' compare to get minPercentChange
+                If resultArray(i, percentChange) < minPercentChangeValue Then
+                        minPercentChangeValue = resultArray(i, percentChange)
+                        minPercentChangeName = resultArray(i, ticker)
+                End If
+                ' compare to get maxPercentChange
+                If resultArray(i, percentChange) > maxPercentChangeValue Then
+                        maxPercentChangeValue = resultArray(i, percentChange)
+                        maxPercentChangeName = resultArray(i, ticker)
+                End If
+                ' compare to get maxTotalVol
+                If resultArray(i, totalVol) > maxTotalVolValue Then
+                        maxTotalVolValue = resultArray(i, totalVol)
+                        maxTotalVolName = resultArray(i, ticker)
+                End If
         Next i
-	' --- output max and min variables
-	' labels to col 15
-	Cells(2, 15) = "Greatest % Increase"
-	Cells(3, 15) = "Greatest % Decrease"
-	Cells(4, 15) = "Greatest Total Volume"
-	
-	' ticker names to col 16
-	Cells(1, 16) = "Ticker"
-	Cells(2, 16) = maxPercentChangeName
-	Cells(3, 16) = minPercentChangeName
-	Cells(4, 16) = maxTotalVolName
-	' values to col 17, max and min percent changes with percent format
-	Cells(1, 17) = "Value"
-	Cells(2, 17) = FormatPercent(maxPercentChangeValue)
-	Cells(3, 17) = FormatPercent(minPercentChangeValue)
-	Cells(4, 17) = maxTotalVolValue
-
-	' --- year data labels
-	Cells(1, 9) = "Ticker"
-	Cells(1, 10) = "Yearly Change"
-	Cells(1, 11) = "Percent Change"
-	Cells(1, 12) = "Total Stock Volume"
-
-
-	' turn screen updating back on
-	Application.ScreenUpdating = True
-End Sub
-
-         
-
+        ' --- output max and min variables
+        ' labels to col 15
+        Cells(2, 15) = "Greatest % Increase"
+        Cells(3, 15) = "Greatest % Decrease"
+        Cells(4, 15) = "Greatest Total Volume"
         
+        ' ticker names to col 16
+        Cells(1, 16) = "Ticker"
+        Cells(2, 16) = maxPercentChangeName
+        Cells(3, 16) = minPercentChangeName
+        Cells(4, 16) = maxTotalVolName
+        ' values to col 17, max and min percent changes with percent format
+        Cells(1, 17) = "Value"
+        Cells(2, 17) = FormatPercent(maxPercentChangeValue)
+        Cells(3, 17) = FormatPercent(minPercentChangeValue)
+        Cells(4, 17) = maxTotalVolValue
+
+        ' --- year data labels
+        Cells(1, 9) = "Ticker"
+        Cells(1, 10) = "Yearly Change"
+        Cells(1, 11) = "Percent Change"
+        Cells(1, 12) = "Total Stock Volume"
 
 
-
-
-' Sub that formats a column based on positive or negative value
-
-'
-
-
-
+        ' turn screen updating back on
+        Application.ScreenUpdating = True
+End Sub
