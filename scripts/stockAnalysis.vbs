@@ -16,7 +16,11 @@
 ' ---
 
 Sub CalculateYearData():
-        ' variable declaration
+	' Turn off screen updating to improve performance, as per:
+	' https://learn.microsoft.com/en-us/office/vba/excel/concepts/cells-and-ranges/fill-a-value-down-into-blank-cells-in-a-column
+	Application.ScreenUpdating = False
+
+	' --- variable declaration
         Dim lastRow As Long
         Dim inputArray() As Variant, resultArray() As Variant ' type variant so we can use different data types
         Dim uniqueTickers As New Collection
@@ -31,17 +35,16 @@ Sub CalculateYearData():
 	Dim maxPercentChangeName$, maxPercentChangeValue#
 	Dim maxTotalVolName$, maxTotalVolValue as LongLong
 	
-        
-        
-        ' Find last row with data in <ticker> column (i.e. 1)
+	' --- read data into inputArray
+        ' Find last row with data in <ticker> column (1)
         ' Source: https://www.excelcampus.com/vba/find-last-row-column-cell/
         lastRow = Cells(Rows.Count, 1).End(xlUp).Row
 
         ' use lastRow to read in range of input data, no headers
         inputArray = Range("A2:G" & lastRow)
 
-        ' get unique ticker values
-        ' Source: https://stackoverflow.com/a/3017973
+        ' --- get unique ticker values
+        ' based on source: https://stackoverflow.com/a/3017973
         On Error Resume Next ' if ticker is already in collection, skip, since it will throw error
         ' note: inputArray is 1-based because it comes from a Range object
         For i = 1 To UBound(inputArray, 1)
@@ -50,8 +53,9 @@ Sub CalculateYearData():
         Next
         On Error GoTo 0
 
-        ' use number of uniqueTickers to declare resultArray, since we now know the number of rows we need
-         ' we need an array and not collection so we can perform operations, as per: https://excelmacromastery.com/excel-vba-collections/
+        ' --- initialize resultArray
+	' use number of uniqueTickers to declare resultArray, since we now know the number of rows we need
+        ' we need an array and not collection so we can perform operations, as per: https://excelmacromastery.com/excel-vba-collections/
         ' see here for declaring dynamic arrays:
         ' https://learn.microsoft.com/en-us/office/vba/language/concepts/getting-started/declaring-arrays
         
@@ -67,12 +71,13 @@ Sub CalculateYearData():
         percentChange = 6
         totalVol = 7
 
-        ' write uniqueTickers to resultArray first column (ticker)
+        ' --- write uniqueTickers to resultArray first column (ticker)
         For i = 1 To uniqueTickers.Count
         resultArray(i - 1, ticker) = uniqueTickers(i) ' note: resultArray is 0-based, but collections are 1-based
         Next i
 
-        ' iterate within inputArray to obtain first and last date, first open, last close and sum of vol values
+	' --- find firstDate, firstOpen, lastDate, lastClose and totalVol
+        ' iterate within inputArray, fill values in resultArray
         ' note: inputArray is 1-based because it comes from a Range object
         For i = 1 To UBound(inputArray, 1)
                 thisTicker = inputArray(i, 1)
@@ -115,42 +120,44 @@ Sub CalculateYearData():
                         resultArray(j, totalVol) = resultArray(j, totalVol) + thisVol
                 End If
         Next i
-	' initialize max and min variables
+
+	' --- initialize max and min variables
 	minPercentChangeName = ""
 	minPercentChangeValue = 0
 	maxPercentChangeName = ""
 	maxPercentChangeValue = 0
 	maxTotalVolName = ""
 	maxTotalVolValue = 0
-        ' iterate within resultArray
+        ' --- calculate year and percent change, write out and get min/max variables
+	' iterate within resultArray
         For i = 0 To UBound(resultArray, 1)
-        ' calculate year and percent change
-                ' yearChange = lastClose - firstOpen
-                resultArray(i, yearChange) = resultArray(i, lastClose) - resultArray(i, firstOpen)
-                ' percentChange = yearChange / firstOpen
-                resultArray(i, percentChange) = resultArray(i, yearChange) / resultArray(i, firstOpen)
-        ' write to spreadsheet the columns of interest
-        Cells(i + 2, 9) = resultArray(i, ticker)                ' column ticker to column I (9)
-        Cells(i + 2, 10) = resultArray(i, yearChange)           ' column yearChange to column J (10)
-        Cells(i + 2, 11) = resultArray(i, percentChange)        ' column percentChange to column K (11)
-        Cells(i + 2, 12) = resultArray(i, totalVol)             ' column totalVol to column L (12)
-	' compare to get minPercentChange
-	If resultArray(i, percentChange) < minPercentChangeValue Then
-		minPercentChangeValue = resultArray(i, percentChange)
-		minPercentChangeName = resultArray(i, ticker)
-	End If
-	' compare to get maxPercentChange
-	If resultArray(i, percentChange) > maxPercentChangeValue Then
-		maxPercentChangeValue = resultArray(i, percentChange)
-		maxPercentChangeName = resultArray(i, ticker)
-	End If
-	' compare to get maxTotalVol
-	If resultArray(i, totalVol) > maxTotalVolValue Then
-		maxTotalVolValue = resultArray(i, totalVol)
-		maxTotalVolName = resultArray(i, ticker)
-	End If
+		' calculate year and percent change
+		' yearChange = lastClose - firstOpen
+		resultArray(i, yearChange) = resultArray(i, lastClose) - resultArray(i, firstOpen)
+		' percentChange = yearChange / firstOpen
+		resultArray(i, percentChange) = resultArray(i, yearChange) / resultArray(i, firstOpen)
+		' write to spreadsheet the columns of interest
+		Cells(i + 2, 9) = resultArray(i, ticker)                ' column ticker to column I (9)
+		Cells(i + 2, 10) = resultArray(i, yearChange)           ' column yearChange to column J (10)
+		Cells(i + 2, 11) = resultArray(i, percentChange)        ' column percentChange to column K (11)
+		Cells(i + 2, 12) = resultArray(i, totalVol)             ' column totalVol to column L (12)
+		' compare to get minPercentChange
+		If resultArray(i, percentChange) < minPercentChangeValue Then
+			minPercentChangeValue = resultArray(i, percentChange)
+			minPercentChangeName = resultArray(i, ticker)
+		End If
+		' compare to get maxPercentChange
+		If resultArray(i, percentChange) > maxPercentChangeValue Then
+			maxPercentChangeValue = resultArray(i, percentChange)
+			maxPercentChangeName = resultArray(i, ticker)
+		End If
+		' compare to get maxTotalVol
+		If resultArray(i, totalVol) > maxTotalVolValue Then
+			maxTotalVolValue = resultArray(i, totalVol)
+			maxTotalVolName = resultArray(i, ticker)
+		End If
         Next i
-	' output max and min variables
+	' --- output max and min variables
 	' ticker names to col 16
 	Cells(2, 16) = maxPercentChangeName
 	Cells(3, 16) = minPercentChangeName
@@ -159,6 +166,12 @@ Sub CalculateYearData():
 	Cells(2, 17) = maxPercentChangeValue
 	Cells(3, 17) = minPercentChangeValue
 	Cells(4, 17) = maxTotalVolValue
+
+	' --- data labels
+	
+
+	' turn screen updating back on
+	Application.ScreenUpdating = True
 End Sub
 
          
