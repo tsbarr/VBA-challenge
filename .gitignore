@@ -1,2 +1,8 @@
 # mac file
 .DS_Store
+
+# office temp and binary files
+~$*.xlsm
+
+# my temp code dumps
+.dump*
