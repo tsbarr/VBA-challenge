@@ -158,17 +158,28 @@ Sub CalculateYearData():
 		End If
         Next i
 	' --- output max and min variables
+	' labels to col 15
+	Cells(2, 15) = "Greatest % Increase"
+	Cells(3, 15) = "Greatest % Decrease"
+	Cells(4, 15) = "Greatest Total Volume"
+	
 	' ticker names to col 16
+	Cells(1, 16) = "Ticker"
 	Cells(2, 16) = maxPercentChangeName
 	Cells(3, 16) = minPercentChangeName
 	Cells(4, 16) = maxTotalVolName
 	' values to col 17
+	Cells(1, 17) = "Value"
 	Cells(2, 17) = maxPercentChangeValue
 	Cells(3, 17) = minPercentChangeValue
 	Cells(4, 17) = maxTotalVolValue
 
-	' --- data labels
-	
+	' --- year data labels
+	Cells(1, 9) = "Ticker"
+	Cells(1, 10) = "Yearly Change"
+	Cells(1, 11) = "Percent Change"
+	Cells(1, 12) = "Total Stock Volume"
+
 
 	' turn screen updating back on
 	Application.ScreenUpdating = True
