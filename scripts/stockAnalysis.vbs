@@ -30,18 +30,16 @@ Sub test():
         ' get unique ticker values
         ' Source: https://stackoverflow.com/a/3017973
         Dim uniqueTickers As New Collection
-        Dim thisTicker As Variant
+        Dim thisTicker As String
         Dim i As Long ' for loop counter
         
         On Error Resume Next ' if ticker is already in collection, skip, since it will throw error
-        ' how to slice array Source:
-        ' https://usefulgyaan.wordpress.com/2013/06/12/vba-trick-of-the-week-slicing-an-array-without-loop-application-index/
-        For Each thisTicker In Application.Index(inputArray, 0, 1)
+        For i = 1 To UBound(inputArray, 1) ' note: inputArray is 1-based because it comes from a Range object
+        thisTicker = inputArray(i, 1)
         uniqueTickers.Add thisTicker, thisTicker
         Next
         On Error GoTo 0
 
-        
         ' use number of uniqueTickers to declare resultArray, since we now know the number of rows we need
          ' we need an array and not collection so we can perform operations, as per: https://excelmacromastery.com/excel-vba-collections/
         ' see here for declaring dynamic arrays:
