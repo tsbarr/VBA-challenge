@@ -137,10 +137,14 @@ Sub CalculateYearData():
 		' percentChange = yearChange / firstOpen
 		resultArray(i, percentChange) = resultArray(i, yearChange) / resultArray(i, firstOpen)
 		' write to spreadsheet the columns of interest
-		Cells(i + 2, 9) = resultArray(i, ticker)                ' column ticker to column I (9)
-		Cells(i + 2, 10) = resultArray(i, yearChange)           ' column yearChange to column J (10)
-		Cells(i + 2, 11) = resultArray(i, percentChange)        ' column percentChange to column K (11)
-		Cells(i + 2, 12) = resultArray(i, totalVol)             ' column totalVol to column L (12)
+		' column ticker to column I (9)
+		Cells(i + 2, 9) = resultArray(i, ticker)
+		' column yearChange to column J (10)
+		Cells(i + 2, 10) = resultArray(i, yearChange)
+		' column percentChange to column K (11), with percent format
+		Cells(i + 2, 11) = FormatPercent(resultArray(i, percentChange))
+		' column totalVol to column L (12)
+		Cells(i + 2, 12) = resultArray(i, totalVol)
 		' compare to get minPercentChange
 		If resultArray(i, percentChange) < minPercentChangeValue Then
 			minPercentChangeValue = resultArray(i, percentChange)
@@ -168,10 +172,10 @@ Sub CalculateYearData():
 	Cells(2, 16) = maxPercentChangeName
 	Cells(3, 16) = minPercentChangeName
 	Cells(4, 16) = maxTotalVolName
-	' values to col 17
+	' values to col 17, max and min percent changes with percent format
 	Cells(1, 17) = "Value"
-	Cells(2, 17) = maxPercentChangeValue
-	Cells(3, 17) = minPercentChangeValue
+	Cells(2, 17) = FormatPercent(maxPercentChangeValue)
+	Cells(3, 17) = FormatPercent(minPercentChangeValue)
 	Cells(4, 17) = maxTotalVolValue
 
 	' --- year data labels
