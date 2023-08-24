@@ -18,6 +18,7 @@
 Sub CalculateAllYears()
 	Dim ws As Worksheet
 	For Each ws In ThisWorkbook.Worksheets
+	ws.Activate
 	CalculateYearData
 	Next ws
 End Sub
