@@ -13,8 +13,15 @@
                 ' 6     <close>       closing price for the date
                 ' 7     <vol>         volume of stock for the date
         ' there are no blanks in the <ticker> column, the first blank from the bottom of the column will be taken as the end of the data
-' ---
-
+' --- loop through sheets and run the CalculateYearData() Sub
+' Based on source: https://excelchamps.com/vba/loop-sheets/
+Sub CalculateAllYears()
+	Dim ws As Worksheet
+	For Each ws In ThisWorkbook.Worksheets
+	CalculateYearData
+	Next ws
+End Sub
+' --- Sub CalculateYearData runs all required analyses in a single sheet
 Sub CalculateYearData():
         ' Turn off screen updating to improve performance, as per:
         ' https://learn.microsoft.com/en-us/office/vba/excel/concepts/cells-and-ranges/fill-a-value-down-into-blank-cells-in-a-column
