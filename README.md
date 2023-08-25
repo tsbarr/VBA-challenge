@@ -24,13 +24,14 @@ Create a script that loops through all the stocks for one year and outputs the f
 
 - Make the appropriate adjustments to your VBA script to enable it to run on every worksheet (that is, every year) at once.
 
+- Make sure to use conditional formatting that will highlight positive change in green and negative change in red.\*
+
 ## Results
 
 The script contains 2 sub procedures: `Main()` and `CalculateYearData()`. To obtain the final solution, the sub procedure `Main()` loops through all the worksheets in the workbook and calls the sub procedure `CalculateYearData()` for each of them. 
 
 The following screenshots show the final result after running the `Main()` sub procedure, with some column widths altered to improve readability of labels.
 
-*Note:* Although the instructions do not indicate what to do for the conditional formatting if the change value is 0, I have made the background yellow for those cases, as seen in the 2020 worksheet screenshot.
 
 ### 2018 worksheet
 
@@ -43,6 +44,8 @@ The following screenshots show the final result after running the `Main()` sub p
 ### 2020 worksheet
 
 ![2020_worksheet_solution](./screenshots/2020_worksheet_solution_tsbarr.png)
+
+\* *Note:* Although the instructions do not indicate what to do for the conditional formatting if the change value is 0, I have made the background yellow for those cases, as seen in the 2020 worksheet screenshot.
 
 ---
 
@@ -57,9 +60,9 @@ The following screenshots show the final result after running the `Main()` sub p
 | Purpose                            	| URL                                      	|
 |------------------------------------	|------------------------------------------	|
 | How to loop through all worksheets 	| https://excelchamps.com/vba/loop-sheets/ 	|
-| How and why to turn off screen updating to improve performances	| https://learn.microsoft.com/en-us/office/vba/excel/concepts/cells-and-ranges/fill-a-value-down-into-blank-cells-in-a-column	|
+| How to turn off screen updating to improve performance	| https://learn.microsoft.com/en-us/office/vba/excel/concepts/cells-and-ranges/fill-a-value-down-into-blank-cells-in-a-column	|
 | How to find last row that contains data	| https://www.excelcampus.com/vba/find-last-row-column-cell/	|
-| Ways to improve performance, like decreasing the amount of times we are reading data from the worksheet	| https://www.soa.org/news-and-publications/newsletters/compact/2012/january/com-2012-iss42/excel-vba-speed-and-efficiency/	|
+| Ways to improve performance, like decreasing how many times we are reading data from the worksheet and turning off screen updating	| https://www.soa.org/news-and-publications/newsletters/compact/2012/january/com-2012-iss42/excel-vba-speed-and-efficiency/	|
 | How to use a collection to get unique values from an array	| https://stackoverflow.com/a/3017973	|
 | Collections vs Arrays	| https://excelmacromastery.com/excel-vba-collections/	|
 | How to declare dynamic arrays	| https://learn.microsoft.com/en-us/office/vba/language/concepts/getting-started/declaring-arrays	|
