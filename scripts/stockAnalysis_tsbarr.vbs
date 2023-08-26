@@ -28,6 +28,7 @@ Sub Main():
 	CalculateYearData
 	Next ws
 End Sub
+
 ' -----------------------------------------------------------
 ' SINGLE WORKSHEET ANALYSIS - called by main to loop through all sheets
 ' -----------------------------------------------------------
@@ -147,7 +148,7 @@ Sub CalculateYearData():
                 End If
         Next i
 
-	' --- year data labels
+	' --- labels for new columns to hold year data
         Cells(1, 9) = "Ticker"
         Cells(1, 10) = "Yearly Change"
         Cells(1, 11) = "Percent Change"

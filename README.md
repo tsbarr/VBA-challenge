@@ -45,7 +45,7 @@ The following screenshots show the final result after running the `Main()` sub p
 
 ![2020_worksheet_solution](./screenshots/2020_worksheet_solution_tsbarr.png)
 
-\* *Note:* Although the instructions do not indicate what to do for the conditional formatting if the change value is 0, I have made the background yellow for those cases, as seen in the 2020 worksheet screenshot.
+\* *Note:* Although the instructions do not indicate what to do for the conditional formatting if the change value is 0, I have made the background yellow for those cases, as seen in the 2020 worksheet screenshot. Another option would be for it to be red, because of inflation.
 
 ---
 
